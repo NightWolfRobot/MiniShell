@@ -162,7 +162,7 @@ public class Core {
         if (args.length != 2) {
             return stringError("Nombre d'args incorrect, essayer : cd <chemin_dossier>\n");
         } else {
-            File dossier = new File(args[1]);
+            File dossier = new File(System.getProperty("user.dir")+"/"+args[1]);
             if (!dossier.isDirectory()) {
                 String i = "";
                 try {
