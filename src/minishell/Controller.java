@@ -32,6 +32,17 @@ public class Controller{
         }
     }
     
+    public static void interrupt_thread(int pid){
+        if(list_thread.isEmpty()){
+            System.out.println("\tError: EmptyList\n");
+        }
+        else{
+            for (Command cmd : list_thread) {
+                cmd.interrupt();
+            }
+        }
+    }
+    
     public void launch(String[] args) {
         while(true){
             System.out.print(">> MiniShell$: ");

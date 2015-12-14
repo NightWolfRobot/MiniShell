@@ -31,6 +31,8 @@ public class Core {
             return executeCommandCompteJusqua(args);
         } else if (args[0].equals("ps")){
             return executeCommandPid(args);
+        } else if (args[0].equals("kill")){
+            return executeCommandKill(args);
         } else {
             return stringError("Commande introuvable\n");
         }
@@ -80,7 +82,7 @@ public class Core {
                     cmpt++;
                     System.out.println("\t"+cmpt);
                 } catch (Exception ex) {
-                    System.out.println("Le thread sleep bug");
+                    break;
                 }
                 //c.print(""+cmpt);
             }
@@ -117,6 +119,17 @@ public class Core {
             
             return str+"\n";
         } else {
+            return stringError("Nombre d'arguments incorrect.\n");
+        }
+    }
+    
+    public static String executeCommandKill(String[] args){
+        if(args.length == 2){
+            int pid = Integer.parseInt(args[1]);
+            Controller.interrupt_thread(pid);
+            return "";
+        }
+        else{
             return stringError("Nombre d'arguments incorrect.\n");
         }
     }
