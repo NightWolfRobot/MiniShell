@@ -33,6 +33,8 @@ public class Core {
             return executeCommandPid(args);
         } else if (args[0].equals("kill")){
             return executeCommandKill(args);
+        } else if (args[0].equals("find")){
+            return executeCommandFind(args);
         } else {
             return stringError("Commande introuvable\n");
         }
@@ -62,6 +64,50 @@ public class Core {
         return stringError("Exit prends aucun ou un entier en argument\n");
     }
 
+    public static String executeCommandFind(String[] args){
+        String str = new String();
+        
+        if(args.length != 4){
+            return stringError("Nombre d'arguments incorrects");
+        }
+        else{
+            if(args[2].equals("-name") || args[2].equals("-iname")){
+                File dossier = new File(System.getProperty("user.dir")+"/"+args[1]);
+                if(dossier.isDirectory()){
+                    String[] list = dossier.list();
+                    args[3] = args[3].replaceAll("'", "");
+                    //System.out.println("Pattern : "+args[3]);
+                    
+                    for (String elem : list) {
+                        try{
+                            Pattern p; 
+                            if(args[2].equals("-iname")){
+                                p = Pattern.compile(args[3], Pattern.CASE_INSENSITIVE);
+                            }
+                            else{
+                                p = Pattern.compile(args[3]);
+                            }
+                            if(p.matcher(elem).matches()){
+                            str += elem + "\n\t";
+                        }
+                        }catch(Exception e){
+                            return stringError("L'expression régulière n'est pas correcte");
+                        }
+                        
+                    }
+                }else{
+                    return stringError("Le dossier n'existe pas");
+                }
+                
+            }
+            else{
+                return stringError("Argument "+args[2]+" invalide");
+            }
+        }
+        
+        return str;
+    }
+    
     public static String stringError(String str){
         return "Error: "+str;
     }
