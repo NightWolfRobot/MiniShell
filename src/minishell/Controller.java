@@ -23,7 +23,7 @@ public class Controller{
 
     public static void print_threads() {
         if(list_thread.isEmpty()){
-            System.out.println("\tError: EmptyList\n");
+            System.out.print("\tOnly the main thread is running\n");
         }
         else{
             for (Command cmd : list_thread) {
