@@ -3,13 +3,13 @@ package minishell;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 /**
  *
  * @author Anthony
  * @author Jessica
  */
-public class Controller{
+public class Controller {
+
     private static ArrayList<Command> list_thread = new ArrayList<>();
     Scanner sc = new Scanner(System.in);
 
@@ -22,49 +22,54 @@ public class Controller{
     }
 
     public static void print_threads() {
-        if(list_thread.isEmpty()){
+        if (list_thread.isEmpty()) {
             System.out.print("\tOnly the main thread is running\n");
-        }
-        else{
+        } else {
             for (Command cmd : list_thread) {
-                System.out.println("\t"+cmd.toString());
+                System.out.println("\t" + cmd.toString());
             }
         }
     }
-    
-    public static void interrupt_thread(int pid){
-        if(list_thread.isEmpty()){
+
+    public static void interrupt_thread(int pid) {
+        if (list_thread.isEmpty()) {
             System.out.println("\tError: EmptyList\n");
-        }
-        else{
+        } else {
             for (Command cmd : list_thread) {
                 cmd.interrupt();
             }
         }
     }
-    
+
     public void launch(String[] args) {
-        while(true){
+        while (true) {
             System.out.print(">> MiniShell$: ");
             String str = sc.nextLine();
-            String[] tokenized_str = str.split(" ");
-            
-            if(tokenized_str[tokenized_str.length-1].equals("&")){
-                String[] str2 = new String[tokenized_str.length-1];
-                int cmpt =0;
-                for(String token: tokenized_str){
-                    str2[cmpt] = tokenized_str[cmpt];
-                    cmpt++;
-                    if(cmpt == tokenized_str.length-1){
-                        break;
+
+            String[] actions_str = str.split(";");
+
+            for (int i = 0; i < actions_str.length; i++) {
+                actions_str[i] = actions_str[i].trim();
+                //System.out.println("Commande :"+actions_str[i]);
+                String[] tokenized_str = actions_str[i].split(" ");
+                if (tokenized_str[tokenized_str.length - 1].equals("&")) {
+                    String[] str2 = new String[tokenized_str.length - 1];
+                    int cmpt = 0;
+                    for (String token : tokenized_str) {
+                        str2[cmpt] = tokenized_str[cmpt];
+                        cmpt++;
+                        if (cmpt == tokenized_str.length - 1) {
+                            break;
+                        }
                     }
+                    Command cmd = new Command(str2);
+                    cmd.start();
+                } else {
+                    System.out.println("\t" + Core.executeCommand(tokenized_str));
                 }
-                Command cmd = new Command(str2);
-                cmd.start();
+
             }
-            else{
-                System.out.println("\t"+Core.executeCommand(tokenized_str));
-            }
+
         }
     }
 
