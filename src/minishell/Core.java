@@ -3,11 +3,11 @@ package minishell;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Scanner;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -43,6 +43,8 @@ public class Core {
             return executeCommandGrep(args);
         } else if (args[0].equals("sleep")) {
             return executeCommandSleep(args);
+        } else if (args[0].equals("sed")) {
+            return executeCommandSed(args);
         } else {
             return stringError("Commande introuvable\n");
         }
@@ -78,6 +80,7 @@ public class Core {
         if (args.length == 1) {
             Scanner sc = new Scanner(System.in);
             try {
+                //!!!!!!!!!!!Tourne à l'infini malgré Ctrl+D!!!!!!!!!!!!!!!!!!
                 while (sc.hasNextLine()) {
                     System.out.println(sc.nextLine());
                 }
@@ -98,6 +101,7 @@ public class Core {
             return stringError("Nombre d'arguments incorrect");
         }
         for (int i = 2; i <= args.length - 1; i++) {
+            //Should replace / with IOUtils.DIR_SEPERATOR
             File file = new File(System.getProperty("user.dir") + "/" + args[i]);
             if (file.isFile()) {
                 try (BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
@@ -118,6 +122,65 @@ public class Core {
             }
         }
         return str;
+    }
+    
+    public static String executeCommandSed(String[] args){
+        if (args.length<2 || args.length>3) {
+            return stringError("sed <format> [<fichier>]");
+        }
+        
+        String str = new String();
+        String[] tab = args[1].split(args[1].charAt(1)+"");
+        Pattern p;
+        tab[1] = tab[1].replaceAll("'", "");
+        try {
+            p = Pattern.compile(tab[1]);
+        } catch (Exception e) {
+            return stringError("Expression régulière incorrecte");
+        }
+        
+        if (args.length == 2) {
+            Scanner sc = new Scanner(System.in);
+            try {
+                //how do I stop the loop?
+                while (sc.hasNextLine()) {
+                    if(tab.length==4 && tab[3].equals("g")){
+                        System.out.println(sc.nextLine().replaceAll(tab[1],tab[2]));
+                    } else {
+                        System.out.println(sc.nextLine().replaceFirst(tab[1],tab[2]));
+                    }
+                }
+            } finally {
+                sc.close();
+            }
+            return "";
+        }
+
+        File file = new File(System.getProperty("user.dir") + "/" + args[2]);
+        if (file.isFile()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
+                String sCurrentLine;
+                String total = "";
+                while ((sCurrentLine = br.readLine()) != null) {
+                    total+=sCurrentLine+"\n";
+                }
+                if(tab.length==4 && tab[3].equals("g")){
+                    total = total.replaceAll(tab[1],tab[2]);
+                } else {
+                    total = total.replaceFirst(tab[1],tab[2]);
+                }
+                FileWriter fw = new FileWriter(file.getAbsolutePath());
+                fw.write(total);
+                fw.close();
+            } catch (IOException e) {
+                //e.printStackTrace();
+                System.out.println("Erroreeeeeee");
+            }
+        } else {
+            return stringError(args[2] + " n'est pas un fichier");
+        }
+        
+        return "";
     }
 
     public static String executeCommandSleep(String[] args) {
@@ -278,18 +341,20 @@ public class Core {
                     //c.print_err("Donnez un dossier en argument.\n");
                     return stringError("Donnez un dossier en argument.\n");
                 }
-                System.out.println(i + " " + dossier.isFile() + " " + dossier.isDirectory() + " " + dossier.isHidden());
+                System.out.println("Donnez un dossier en argument\n");
+                //System.out.println(i + " " + dossier.isFile() + " " + dossier.isDirectory() + " " + dossier.isHidden());
 
                 //return 1;
-            }
-            try {
-                System.setProperty("user.dir", dossier.getCanonicalPath());
-                return System.getProperty("user.dir") + '\n';
-            } catch (IOException e) {
-                //c.print_err("Ouverture de fichier\n");
-                return stringError("Ouverture de fichier");
+            } else {
+                try {
+                    System.setProperty("user.dir", dossier.getCanonicalPath());
+                    return System.getProperty("user.dir") + '\n';
+                } catch (IOException e) {
+                    //c.print_err("Ouverture de fichier\n");
+                    return stringError("Ouverture de fichier");
+                }
             }
         }
-
+        return "";
     }
 }
