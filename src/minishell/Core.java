@@ -41,6 +41,8 @@ public class Core {
             return executeCommandFind(args);
         } else if (args[0].equals("grep")) {
             return executeCommandGrep(args);
+        } else if (args[0].equals("sleep")) {
+            return executeCommandSleep(args);
         } else {
             return stringError("Commande introuvable\n");
         }
@@ -118,6 +120,17 @@ public class Core {
         return str;
     }
 
+    public static String executeCommandSleep(String[] args) {
+        try {
+            int n= Integer.parseInt(args[1]);
+            Thread.sleep(n * 1000);
+            return "";
+        } catch (Exception ex) {
+            System.err.println("Error dans le sleep");
+            return "";
+        }
+    }
+
     public static String executeCommandFind(String[] args) {
         String str = new String();
 
@@ -125,6 +138,7 @@ public class Core {
             return stringError("Nombre d'arguments incorrects");
         } else {
             if (args[2].equals("-name") || args[2].equals("-iname")) {
+                System.out.println(System.getProperty("user.dir") + "/" + args[1]);
                 File dossier = new File(System.getProperty("user.dir") + "/" + args[1]);
                 if (dossier.isDirectory()) {
                     String[] list = dossier.list();
